@@ -6,11 +6,13 @@ import math
 from qhue import Bridge, QhueException, create_new_username
 from time import sleep
 
+path = os.path.dirname(os.path.realpath(__file__)) + '/'
+
 # Note: must make credential file with bridge IP address to run
-with open("bridge.conf", "r") as bridge_file:
+with open(path + "bridge.conf", "r") as bridge_file:
     BRIDGE_IP = bridge_file.read()
 
-CRED_FILE_PATH = "qhue_username.txt"
+CRED_FILE_PATH = path + "qhue_username.txt"
 
 MARGIN = 10
 
