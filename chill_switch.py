@@ -99,12 +99,8 @@ class Hue:
             self.bridge.lights(only_one+1, 'state', on=to_value)
             return
 
-        if light_states.count(True) >= len(light_states) // 2:
-            for i in xrange(len(light_states)):
-                self.bridge.lights(i+1, 'state', on=to_value)
-        else:
-            for i in xrange(len(light_states)):
-                self.bridge.lights(i+1, 'state', on=to_value)
+        for i in xrange(len(light_states)):
+            self.bridge.lights(i+1, 'state', on=to_value)
 
     def set_brightness(self, val, set_all=False):
         val = int(math.ceil(val))
@@ -113,6 +109,7 @@ class Hue:
 
         light_states = self.light_power_states()
          
+        # by default, changes brightness of all "on" lights
         for i in xrange(len(light_states)):
             if light_states[i] == True:
                 self.bridge.lights(i+1, 'state', bri=val)
@@ -137,7 +134,7 @@ class Hue:
                     self.bridge.lights(i+1, 'state', on=True, ct=val) 
 
 
-class Switch:
+class SwitchController:
     def __init__(self, ui):
         self.ui = ui
         self.hue = Hue()
@@ -151,12 +148,12 @@ class Switch:
     def toggle_checkboxes(self):
         light_states = self.hue.light_power_states()
         for i, box in enumerate(self.ui.checkboxes):
-            if box.state != light_states[i]:
+            if box.checked != light_states[i]:
                 box.toggle()
 
     def toggle_power(self):
         light_states = self.hue.light_power_states()
-        toggle_val = (light_states.count("False") > 0)
+        toggle_val = (light_states.count(False) > 0)
         self.hue.toggle_power(to_value=toggle_val)
         self.toggle_checkboxes()
 
@@ -193,7 +190,6 @@ class Switch:
         if "power_list" in scene.keys():
             for i in xrange(len(scene["power_list"])):
                 self.hue.toggle_power(only_one=i, to_value=scene["power_list"][i])
-            self.toggle_checkboxes()
         if "bri" in scene.keys():
             self.hue.set_brightness(scene["bri"])
         if "color_list" in scene.keys():
@@ -203,6 +199,7 @@ class Switch:
             else:
                 for i, color in enumerate(scene["color_list"]):
                     self.hue.set_color(i+1, scene["colormode"], color)
+        self.toggle_checkboxes()
 
     def day(self, btn, mbtn):
         self.set_scene("day")
@@ -231,36 +228,36 @@ class SwitchUI(ui.Scene):
         label_height = ui.theme.current.label_height
         scrollbar_size = ui.SCROLLBAR_SIZE
 
-        self.switch = Switch(self)
+        self.controller = SwitchController(self)
 
         # Light Color Buttons
         self.day_button = ui.Button(ui.Rect(
             MARGIN, 88, BUTTON_WIDTH, BUTTON_HEIGHT), 'Day')
-        self.day_button.on_clicked.connect(self.switch.day)
+        self.day_button.on_clicked.connect(self.controller.day)
         self.add_child(self.day_button)
 
         self.night_button = ui.Button(ui.Rect(
             (MARGIN) + 120, 88,
             BUTTON_WIDTH, BUTTON_HEIGHT), 'Night')
-        self.night_button.on_clicked.connect(self.switch.night)
+        self.night_button.on_clicked.connect(self.controller.night)
         self.add_child(self.night_button)
 
         self.theater_button = ui.Button(ui.Rect(
             MARGIN, (MARGIN) + 60 + 88,
             BUTTON_WIDTH, BUTTON_HEIGHT), 'Theater')
-        self.theater_button.on_clicked.connect(self.switch.theater)
+        self.theater_button.on_clicked.connect(self.controller.theater)
         self.add_child(self.theater_button)
 
         self.chill_button = ui.Button(ui.Rect(
             (MARGIN) + 120, (MARGIN) + 60 + 88,
             BUTTON_WIDTH, BUTTON_HEIGHT), 'Chill')
-        self.chill_button.on_clicked.connect(self.switch.chill)
+        self.chill_button.on_clicked.connect(self.controller.chill)
         self.add_child(self.chill_button)
 
         # Power Button
         self.power_button = ui.Button(ui.Rect(
             MARGIN, MARGIN, 80, 60), "Power")
-        self.power_button.on_clicked.connect(self.switch.power)
+        self.power_button.on_clicked.connect(self.controller.power)
         self.add_child(self.power_button)
 
         # Brightness Buttons
@@ -268,41 +265,40 @@ class SwitchUI(ui.Scene):
             self.chill_button.frame.right + 2 * MARGIN,
             self.night_button.frame.top, BUTTON_HEIGHT,
             BUTTON_HEIGHT), '+')
-        self.brightness_up_button.on_clicked.connect(self.switch.brightness_up)
+        self.brightness_up_button.on_clicked.connect(self.controller.brightness_up)
         self.add_child(self.brightness_up_button)
 
         self.brightness_down_button = ui.Button(ui.Rect(
             self.chill_button.frame.right + 2 * MARGIN,
             self.chill_button.frame.top, BUTTON_HEIGHT,
             BUTTON_HEIGHT), '-')
-        self.brightness_down_button.on_clicked.connect(self.switch.brightness_down)
+        self.brightness_down_button.on_clicked.connect(self.controller.brightness_down)
         self.add_child(self.brightness_down_button)
 
         # Light Enabled Checkboxes
         self.enabled_box = ui.Checkbox(ui.Rect(self.power_button.frame.right + 15,
             3 * MARGIN, 20, 40), "1")
         self.add_child(self.enabled_box)
-        self.enabled_box.on_checked.connect(self.switch.toggle_light0)
-        self.enabled_box.on_unchecked.connect(self.switch.toggle_light0)
+        self.enabled_box.on_checked.connect(self.controller.toggle_light0)
+        self.enabled_box.on_unchecked.connect(self.controller.toggle_light0)
         self.enabled_box.stylize()
 
         self.enabled_box1 = ui.Checkbox(ui.Rect(self.enabled_box.frame.right + 15,
             3 * MARGIN, 20, 40), "2")
         self.add_child(self.enabled_box1)
-        self.enabled_box1.on_checked.connect(self.switch.toggle_light1)
-        self.enabled_box1.on_unchecked.connect(self.switch.toggle_light1)
+        self.enabled_box1.on_checked.connect(self.controller.toggle_light1)
+        self.enabled_box1.on_unchecked.connect(self.controller.toggle_light1)
         self.enabled_box1.stylize()
 
         self.enabled_box2 = ui.Checkbox(ui.Rect(self.enabled_box1.frame.right + 15,
             3 * MARGIN, 20, 40), "3")
         self.add_child(self.enabled_box2)
-        self.enabled_box2.on_checked.connect(self.switch.toggle_light2)
-        self.enabled_box2.on_unchecked.connect(self.switch.toggle_light2)
+        self.enabled_box2.on_checked.connect(self.controller.toggle_light2)
+        self.enabled_box2.on_unchecked.connect(self.controller.toggle_light2)
         self.enabled_box2.stylize()
 
         self.checkboxes = [self.enabled_box, self.enabled_box1, self.enabled_box2]
-        self.switch.initialize_checkboxes()
-
+        self.controller.initialize_checkboxes()
 
 
 if __name__ == "__main__":
