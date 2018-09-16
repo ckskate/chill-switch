@@ -42,7 +42,9 @@ SCENES = {
     },
     "chill": {
         "bri": 100,
-        "power_list": [True, True, True]
+        "power_list": [True, True, True],
+        "colormode": "xy",
+        "color_list": [[0.1871, 0.0632], [0.656, 0.3302], [0.3517, 0.1434]]
     }
 }
 
@@ -304,6 +306,7 @@ class SwitchUI(ui.Scene):
 
 
 if __name__ == "__main__":
+    sleep(2)
     os.putenv('SDL_FBDEV', '/dev/fb1')
     os.putenv('SDL_MOUSEDRV', 'TSLIB')
     os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
