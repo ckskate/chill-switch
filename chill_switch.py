@@ -306,7 +306,7 @@ class SwitchUI(ui.Scene):
 
 
 if __name__ == "__main__":
-    sleep(2)
+    sleep(5)
     os.putenv('SDL_FBDEV', '/dev/fb1')
     os.putenv('SDL_MOUSEDRV', 'TSLIB')
     os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
