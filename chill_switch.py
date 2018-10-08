@@ -120,7 +120,7 @@ class Hue:
             elif set_all == True:
                 self.bridge.lights(i+1, 'state', on=True, bri=val)
 
-    def set_color(self, light_index, val_type, val, set_all=False):
+    def set_color(self, i, val_type, val, set_all=False):
         if not set_all:
             if val_type == "xy":
                 self.bridge.lights(i+1, 'state', on=True, xy=val)  
@@ -212,7 +212,7 @@ class SwitchController:
     def night(self, btn, mbtn):
         self.set_scene("night")
         print("this is night")
-    
+
     def theater(self, btn, mbtn):
         self.set_scene("theater")
         print("this is theater")
