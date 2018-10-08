@@ -123,19 +123,19 @@ class Hue:
     def set_color(self, i, val_type, val, set_all=False):
         if not set_all:
             if val_type == "xy":
-                self.bridge.lights(i+1, 'state', on=True, xy=val)  
+                self.bridge.lights(i, 'state', on=True, xy=val)  
             elif val_type == "hsl":
-                self.bridge.lights(i+1, 'state', on=True, hsl=val)
+                self.bridge.lights(i, 'state', on=True, hsl=val)
             elif val_type == "ct":
-                self.bridge.lights(i+1, 'state', on=True, ct=val) 
+                self.bridge.lights(i, 'state', on=True, ct=val) 
         else:
             for i in xrange(3):
                 if val_type == "xy":
-                    self.bridge.lights(i+1, 'state', on=True, xy=val)  
+                    self.bridge.lights(i, 'state', on=True, xy=val)  
                 elif val_type == "hsl":
-                    self.bridge.lights(i+1, 'state', on=True, hsl=val)
+                    self.bridge.lights(i, 'state', on=True, hsl=val)
                 elif val_type == "ct":
-                    self.bridge.lights(i+1, 'state', on=True, ct=val) 
+                    self.bridge.lights(i, 'state', on=True, ct=val) 
 
 
 class SwitchController:
